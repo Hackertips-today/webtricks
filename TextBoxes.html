@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reusable Secure Text Box</title>
+    <style>
+      /* Base styles for body */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #333;
+        color: cyan;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="display-container"></div>
+
+    <script>
+      class TextDisplayBox {
+        constructor({
+          headerText = "",
+          paragraphText = "",
+          width = "90%",
+          maxWidth = "90vw",
+          height = "70vh",
+          minHeight = "400px",
+          backgroundColor = "#111446",
+          color = "lightcyan",
+          opacity = 0.85,
+          padding = "20px",
+          titleColor = "whitesmoke",
+          textColor = "#09f",
+          scrollBarThumbColor = "#4b0082",
+          scrollBarTrackColor = "#222",
+          containerId = "display-container",
+        } = {}) {
+          // Dynamic content passed as parameters
+          this.headerText = headerText
+          this.paragraphText = paragraphText
+
+          // Styling attributes
+          this.width = width
+          this.maxWidth = maxWidth
+          this.height = height
+          this.minHeight = minHeight
+          this.backgroundColor = backgroundColor
+          this.color = color
+          this.opacity = opacity
+          this.padding = padding
+          this.titleColor = titleColor
+          this.textColor = textColor
+          this.scrollBarThumbColor = scrollBarThumbColor
+          this.scrollBarTrackColor = scrollBarTrackColor
+          this.container = document.getElementById(containerId)
+
+          // Generate unique class prefix and nonce for each instance
+          this.uniqueClass = `mybox${Math.random().toString(36).substr(2, 5)}`
+          this.nonce = Math.random().toString(36).substr(2, 8)
+        }
+
+        createStyles() {
+          const style = document.createElement("style")
+          style.nonce = this.nonce // Adding nonce for CSP security
+
+          style.innerHTML = `
+                .${this.uniqueClass}-content-box {
+                    width: ${this.width};
+                    max-width: ${this.maxWidth};
+                    height: ${this.height};
+                    min-height: ${this.minHeight};
+                    background-color: ${this.backgroundColor};
+                    color: ${this.color};
+                    opacity: ${this.opacity};
+                    padding: ${this.padding};
+                    overflow-y: auto;
+                    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+                    border-radius: 8px;
+                    box-sizing: border-box;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1em;
+                }
+                .${this.uniqueClass}-content-box h2 {
+                    color: ${this.titleColor};
+                    margin-top: 0;
+                    font-size: 1.5rem;
+                    text-align: center;
+                }
+                .${this.uniqueClass}-content-box p, 
+                .${this.uniqueClass}-content-box pre {
+                    line-height: 1.4;
+                    color: ${this.textColor};
+                    font-size: 1rem;
+                    text-align: justify;
+                    padding: 0 10px;
+                }
+                /* Custom Scrollbar */
+                .${this.uniqueClass}-content-box::-webkit-scrollbar {
+                    width: 12px;
+                }
+                .${this.uniqueClass}-content-box::-webkit-scrollbar-track {
+                    background-color: ${this.scrollBarTrackColor};
+                    border-radius: 10px;
+                }
+                .${this.uniqueClass}-content-box::-webkit-scrollbar-thumb {
+                    background-color: ${this.scrollBarThumbColor};
+                    border-radius: 10px;
+                    border: 3px solid #444;
+                }
+                .${this.uniqueClass}-content-box::-webkit-scrollbar-thumb:hover {
+                    background-color: #666;
+                }
+                /* Responsive Adjustments */
+                @media (max-width: 768px) {
+                    .${this.uniqueClass}-content-box {
+                        width: 95%;
+                        height: 60vh;
+                        font-size: 0.9rem;
+                        padding: 15px;
+                    }
+                    .${this.uniqueClass}-content-box h2 {
+                        font-size: 1.3rem;
+                    }
+                }
+                @media (max-width: 480px) {
+                    .${this.uniqueClass}-content-box {
+                        width: 100%;
+                        height: 50vh;
+                        padding: 10px;
+                    }
+                    .${this.uniqueClass}-content-box h2 {
+                        font-size: 1.1rem;
+                    }
+                    .${this.uniqueClass}-content-box p, 
+                    .${this.uniqueClass}-content-box pre {
+                        font-size: 0.8rem;
+                        padding: 0 5px;
+                    }
+                }
+            `
+          document.head.appendChild(style)
+        }
+
+        display() {
+          this.createStyles()
+
+          const box = document.createElement("div")
+          box.classList.add(`${this.uniqueClass}-content-box`)
+
+          // Set dynamic content with header and paragraph
+          box.innerHTML = `
+                <h2>${this.headerText}</h2>
+                <p>${this.paragraphText}</p>
+            `
+          this.container.appendChild(box)
+        }
+      }
+
+      // Example of creating a new TextDisplayBox with custom content
+      const customBox1 = new TextDisplayBox({
+        headerText: "Welcome to hackertips.today",
+        paragraphText:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras venenatis euismod malesuada. Phasellus lacinia dui nulla, ac blandit lorem euismod eget. Nullam vulputate consequat sapien, in pharetra metus scelerisque vel. In aliquam felis ac semper bibendum. Pellentesque vel facilisis urna. Curabitur accumsan ultrices felis.",
+        containerId: "display-container",
+      })
+      customBox1.display()
+
+      // Another example instance with different content
+      const customBox2 = new TextDisplayBox({
+        headerText: "About hackertips.today",
+        paragraphText:
+          "Hackertips.today is your daily resource for the latest insights on cybersecurity, ethical hacking, and more. Stay updated with best practices, tutorials, and expert tips to secure your digital footprint.",
+        containerId: "display-container",
+      })
+      customBox2.display()
+    </script>
+  </body>
+</html>
